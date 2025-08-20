@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #1d3557;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header i {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .income-card .card-header i {
+            color: var(--success);
+        }
+
+        .expense-card .card-header i {
+            color: var(--danger);
+        }
+
+        .savings-card .card-header i {
+            color: var(--warning);
+        }
+
+        .card h3 {
+            color: var(--gray);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .card .amount {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .income-card .amount {
+            color: var(--success);
+        }
+
+        .expense-card .amount {
+            color: var(--danger);
+        }
+
+        .savings-card .amount {
+            color: var(--warning);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-section h2 {
+            color: var(--dark);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .transactions-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .transactions-section h2 {
+            color: var(--dark);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        .transaction-item:hover {
+            background: #f8f9fa;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .transaction-category {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .income-amount {
+            color: var(--success);
+        }
+
+        .expense-amount {
+            color: var(--danger);
+        }
+
+        .transaction-date {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-left: 15px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-left: 15px;
+            transition: var(--transition);
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .summary-chart {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            margin-top: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .chart-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .chart-center .amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .chart-center .label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .savings-progress {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--warning);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .savings-target {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+            margin-top: 30px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-wallet"></i> Personal Finance Tracker</h1>
+            <p>Track your income, expenses, and savings in one place</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card income-card">
+                <div class="card-header">
+                    <i class="fas fa-arrow-down"></i>
+                    <div>
+                        <h3>Total Income</h3>
+                        <div class="amount" id="total-income">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card expense-card">
+                <div class="card-header">
+                    <i class="fas fa-arrow-up"></i>
+                    <div>
+                        <h3>Total Expenses</h3>
+                        <div class="amount" id="total-expenses">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card savings-card">
+                <div class="card-header">
+                    <i class="fas fa-piggy-bank"></i>
+                    <div>
+                        <h3>Total Savings</h3>
+                        <div class="amount" id="total-savings">$0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2><i class="fas fa-plus-circle"></i> Add Transaction</h2>
+                <form id="transaction-form">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" class="form-control" placeholder="Enter description" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Amount ($)</label>
+                        <input type="number" id="amount" class="form-control" placeholder="Enter amount" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" class="form-control" required>
+                            <option value="">Select type</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" class="form-control" required>
+                            <option value="">Select category</option>
+                            <optgroup label="Income">
+                                <option value="salary">Salary</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="investment">Investment</option>
+                                <option value="other-income">Other</option>
+                            </optgroup>
+                            <optgroup label="Expense">
+                                <option value="food">Food & Dining</option>
+                                <option value="transport">Transportation</option>
+                                <option value="housing">Housing</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="health">Healthcare</option>
+                                <option value="other-expense">Other</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Add Transaction
+                    </button>
+                </form>
+
+                <div class="savings-progress">
+                    <h3><i class="fas fa-bullseye"></i> Savings Goal</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="savings-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="savings-target">
+                        <span id="savings-current">$0.00</span>
+                        <span id="savings-goal">Goal: $1,000.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="transactions-section">
+                <h2><i class="fas fa-list"></i> Recent Transactions</h2>
+                <div class="transaction-list" id="transaction-list">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Add your first transaction to get started</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2023 Personal Finance Tracker | Made with <i class="fas fa-heart" style="color: #f72585;"></i></p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize data
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let savingsGoal = 1000;
+
+        // DOM Elements
+        const transactionForm = document.getElementById('transaction-form');
+        const transactionList = document.getElementById('transaction-list');
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpensesEl = document.getElementById('total-expenses');
+        const totalSavingsEl = document.getElementById('total-savings');
+        const savingsCurrentEl = document.getElementById('savings-current');
+        const savingsGoalEl = document.getElementById('savings-goal');
+        const savingsProgressEl = document.getElementById('savings-progress');
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Event Listeners
+        transactionForm.addEventListener('submit', addTransaction);
+
+        // Initialize
+        updateDashboard();
+        renderTransactions();
+
+        // Functions
+        function addTransaction(e) {
+            e.preventDefault();
+
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
+            const category = document.getElementById('category').value;
+            const date = document.getElementById('date').value;
+
+            if (!description || !amount || !type || !category || !date) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const transaction = {
+                id: Date.now(),
+                description,
+                amount,
+                type,
+                category,
+                date
+            };
+
+            transactions.push(transaction);
+            saveTransactions();
+            updateDashboard();
+            renderTransactions();
+
+            // Reset form
+            transactionForm.reset();
+            document.getElementById('date').valueAsDate = new Date();
+        }
+
+        function deleteTransaction(id) {
+            transactions = transactions.filter(transaction => transaction.id !== id);
+            saveTransactions();
+            updateDashboard();
+            renderTransactions();
+        }
+
+        function saveTransactions() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        function updateDashboard() {
+            const totalIncome = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const totalExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const totalSavings = totalIncome - totalExpenses;
+            const savingsPercentage = Math.min((totalSavings / savingsGoal) * 100, 100);
+
+            totalIncomeEl.textContent = `$${totalIncome.toFixed(2)}`;
+            totalExpensesEl.textContent = `$${totalExpenses.toFixed(2)}`;
+            totalSavingsEl.textContent = `$${totalSavings.toFixed(2)}`;
+            savingsCurrentEl.textContent = `$${totalSavings.toFixed(2)}`;
+            savingsGoalEl.textContent = `Goal: $${savingsGoal.toFixed(2)}`;
+            savingsProgressEl.style.width = `${savingsPercentage}%`;
+        }
+
+        function renderTransactions() {
+            if (transactions.length === 0) {
+                transactionList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Add your first transaction to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort transactions by date (newest first)
+            const sortedTransactions = [...transactions].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+
+            transactionList.innerHTML = sortedTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">${transaction.description}</div>
+                        <div class="transaction-category">${getCategoryName(transaction.category)}</div>
+                    </div>
+                    <div class="transaction-amount ${transaction.type === 'income' ? 'income-amount' : 'expense-amount'}">
+                        ${transaction.type === 'income' ? '+' : '-'}$${transaction.amount.toFixed(2)}
+                    </div>
+                    <div class="transaction-date">
+                        ${formatDate(transaction.date)}
+                    </div>
+                    <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'salary': 'Salary',
+                'freelance': 'Freelance',
+                'investment': 'Investment',
+                'other-income': 'Other Income',
+                'food': 'Food & Dining',
+                'transport': 'Transportation',
+                'housing': 'Housing',
+                'utilities': 'Utilities',
+                'entertainment': 'Entertainment',
+                'shopping': 'Shopping',
+                'health': 'Healthcare',
+                'other-expense': 'Other Expense'
+            };
+            return categories[category] || category;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Make deleteTransaction available globally for inline onclick
+        window.deleteTransaction = deleteTransaction;
+    </script>
+</body>
+</html>
