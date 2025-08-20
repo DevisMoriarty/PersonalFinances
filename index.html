@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Tracker</title>
+    <title>Advanced Personal Finance Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -33,7 +33,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -54,7 +54,43 @@
             opacity: 0.9;
         }
 
-        .dashboard {
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .tab:hover {
+            background: #f8f9fa;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
@@ -85,15 +121,15 @@
             margin-right: 15px;
         }
 
-        .income-card .card-header i {
-            color: var(--success);
-        }
-
-        .expense-card .card-header i {
-            color: var(--danger);
+        .checking-card .card-header i {
+            color: var(--primary);
         }
 
         .savings-card .card-header i {
+            color: var(--success);
+        }
+
+        .total-card .card-header i {
             color: var(--warning);
         }
 
@@ -108,15 +144,15 @@
             font-weight: 700;
         }
 
-        .income-card .amount {
-            color: var(--success);
-        }
-
-        .expense-card .amount {
-            color: var(--danger);
+        .checking-card .amount {
+            color: var(--primary);
         }
 
         .savings-card .amount {
+            color: var(--success);
+        }
+
+        .total-card .amount {
             color: var(--warning);
         }
 
@@ -192,6 +228,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
         .transactions-section {
             background: white;
             border-radius: 15px;
@@ -251,6 +297,10 @@
             color: var(--danger);
         }
 
+        .transfer-amount {
+            color: var(--primary);
+        }
+
         .transaction-date {
             font-size: 0.85rem;
             color: var(--gray);
@@ -283,37 +333,30 @@
             opacity: 0.5;
         }
 
-        .summary-chart {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
+        .savings-goal-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
             margin-top: 20px;
         }
 
-        .chart-container {
-            position: relative;
-            width: 150px;
-            height: 150px;
-        }
-
-        .chart-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        .chart-center .amount {
-            font-size: 1.5rem;
-            font-weight: 700;
+        .savings-goal-section h2 {
             color: var(--dark);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
         }
 
-        .chart-center .label {
-            font-size: 0.9rem;
-            color: var(--gray);
+        .goal-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .goal-form .form-group {
+            margin-bottom: 0;
         }
 
         .savings-progress {
@@ -330,7 +373,7 @@
 
         .progress-fill {
             height: 100%;
-            background: var(--warning);
+            background: var(--success);
             border-radius: 5px;
             transition: width 0.5s ease;
         }
@@ -341,6 +384,54 @@
             margin-top: 5px;
             font-size: 0.9rem;
             color: var(--gray);
+        }
+
+        .predictions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .predictions-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .predictions-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .predictions-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actual-input {
+            width: 100px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .prediction-amount {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .actual-amount {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .difference-positive {
+            color: var(--success);
+        }
+
+        .difference-negative {
+            color: var(--danger);
         }
 
         footer {
@@ -355,113 +446,53 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-wallet"></i> Personal Finance Tracker</h1>
-            <p>Track your income, expenses, and savings in one place</p>
+            <h1><i class="fas fa-wallet"></i> Advanced Finance Tracker</h1>
+            <p>Track your accounts, savings, and financial predictions</p>
         </header>
 
-        <div class="dashboard">
-            <div class="card income-card">
-                <div class="card-header">
-                    <i class="fas fa-arrow-down"></i>
-                    <div>
-                        <h3>Total Income</h3>
-                        <div class="amount" id="total-income">$0.00</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card expense-card">
-                <div class="card-header">
-                    <i class="fas fa-arrow-up"></i>
-                    <div>
-                        <h3>Total Expenses</h3>
-                        <div class="amount" id="total-expenses">$0.00</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card savings-card">
-                <div class="card-header">
-                    <i class="fas fa-piggy-bank"></i>
-                    <div>
-                        <h3>Total Savings</h3>
-                        <div class="amount" id="total-savings">$0.00</div>
-                    </div>
-                </div>
-            </div>
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">Dashboard</div>
+            <div class="tab" data-tab="checking">Checking Account</div>
+            <div class="tab" data-tab="savings">Savings Account</div>
         </div>
 
-        <div class="main-content">
-            <div class="form-section">
-                <h2><i class="fas fa-plus-circle"></i> Add Transaction</h2>
-                <form id="transaction-form">
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <input type="text" id="description" class="form-control" placeholder="Enter description" required>
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard-tab">
+            <div class="dashboard-grid">
+                <div class="card checking-card">
+                    <div class="card-header">
+                        <i class="fas fa-credit-card"></i>
+                        <div>
+                            <h3>Checking Balance</h3>
+                            <div class="amount" id="checking-balance">$0.00</div>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="amount">Amount ($)</label>
-                        <input type="number" id="amount" class="form-control" placeholder="Enter amount" step="0.01" required>
+                <div class="card savings-card">
+                    <div class="card-header">
+                        <i class="fas fa-piggy-bank"></i>
+                        <div>
+                            <h3>Savings Balance</h3>
+                            <div class="amount" id="savings-balance">$0.00</div>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="type">Type</label>
-                        <select id="type" class="form-control" required>
-                            <option value="">Select type</option>
-                            <option value="income">Income</option>
-                            <option value="expense">Expense</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category" class="form-control" required>
-                            <option value="">Select category</option>
-                            <optgroup label="Income">
-                                <option value="salary">Salary</option>
-                                <option value="freelance">Freelance</option>
-                                <option value="investment">Investment</option>
-                                <option value="other-income">Other</option>
-                            </optgroup>
-                            <optgroup label="Expense">
-                                <option value="food">Food & Dining</option>
-                                <option value="transport">Transportation</option>
-                                <option value="housing">Housing</option>
-                                <option value="utilities">Utilities</option>
-                                <option value="entertainment">Entertainment</option>
-                                <option value="shopping">Shopping</option>
-                                <option value="health">Healthcare</option>
-                                <option value="other-expense">Other</option>
-                            </optgroup>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" id="date" class="form-control" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Add Transaction
-                    </button>
-                </form>
-
-                <div class="savings-progress">
-                    <h3><i class="fas fa-bullseye"></i> Savings Goal</h3>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="savings-progress" style="width: 0%"></div>
-                    </div>
-                    <div class="savings-target">
-                        <span id="savings-current">$0.00</span>
-                        <span id="savings-goal">Goal: $1,000.00</span>
+                <div class="card total-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <h3>Total Net Worth</h3>
+                            <div class="amount" id="total-net-worth">$0.00</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="transactions-section">
-                <h2><i class="fas fa-list"></i> Recent Transactions</h2>
-                <div class="transaction-list" id="transaction-list">
+            <div class="card">
+                <h2><i class="fas fa-exchange-alt"></i> Recent Transactions</h2>
+                <div class="transaction-list" id="recent-transactions">
                     <div class="empty-state">
                         <i class="fas fa-inbox"></i>
                         <h3>No transactions yet</h3>
@@ -471,45 +502,240 @@
             </div>
         </div>
 
+        <!-- Checking Account Tab -->
+        <div class="tab-content" id="checking-tab">
+            <div class="main-content">
+                <div class="form-section">
+                    <h2><i class="fas fa-plus-circle"></i> Add Transaction</h2>
+                    <form id="checking-form">
+                        <div class="form-group">
+                            <label for="checking-description">Description</label>
+                            <input type="text" id="checking-description" class="form-control" placeholder="Enter description" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="checking-amount">Amount ($)</label>
+                            <input type="number" id="checking-amount" class="form-control" placeholder="Enter amount" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="checking-type">Type</label>
+                            <select id="checking-type" class="form-control" required>
+                                <option value="">Select type</option>
+                                <option value="income">Income</option>
+                                <option value="expense">Expense</option>
+                                <option value="transfer-to-savings">Transfer to Savings</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="checking-category">Category</label>
+                            <select id="checking-category" class="form-control" required>
+                                <option value="">Select category</option>
+                                <optgroup label="Income">
+                                    <option value="salary">Salary</option>
+                                    <option value="freelance">Freelance</option>
+                                    <option value="investment">Investment</option>
+                                    <option value="other-income">Other</option>
+                                </optgroup>
+                                <optgroup label="Expense">
+                                    <option value="food">Food & Dining</option>
+                                    <option value="transport">Transportation</option>
+                                    <option value="housing">Housing</option>
+                                    <option value="utilities">Utilities</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="shopping">Shopping</option>
+                                    <option value="health">Healthcare</option>
+                                    <option value="other-expense">Other</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="checking-date">Date</label>
+                            <input type="date" id="checking-date" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Transaction
+                        </button>
+                    </form>
+                </div>
+
+                <div class="transactions-section">
+                    <h2><i class="fas fa-list"></i> Checking Account Transactions</h2>
+                    <div class="transaction-list" id="checking-transactions">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>No transactions yet</h3>
+                            <p>Add your first transaction to get started</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Savings Account Tab -->
+        <div class="tab-content" id="savings-tab">
+            <div class="main-content">
+                <div class="form-section">
+                    <h2><i class="fas fa-bullseye"></i> Savings Goal Settings</h2>
+                    <form id="savings-goal-form">
+                        <div class="goal-form">
+                            <div class="form-group">
+                                <label for="savings-goal">Goal Amount ($)</label>
+                                <input type="number" id="savings-goal" class="form-control" placeholder="Enter goal amount" step="0.01" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="interest-rate">Monthly Interest Rate (%)</label>
+                                <input type="number" id="interest-rate" class="form-control" placeholder="Enter interest rate" step="0.01" required>
+                            </div>
+
+                            <div class="form-group" style="align-self: flex-end;">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Set Goal
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="savings-progress">
+                        <h3>Progress Toward Goal</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="savings-progress" style="width: 0%"></div>
+                        </div>
+                        <div class="savings-target">
+                            <span id="savings-current">$0.00</span>
+                            <span id="savings-goal-display">Goal: $1,000.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="savings-goal-section">
+                    <h2><i class="fas fa-chart-bar"></i> Savings Predictions</h2>
+                    <table class="predictions-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Predicted Amount</th>
+                                <th>Actual Amount</th>
+                                <th>Difference (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="predictions-table-body">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #6c757d;">Set a savings goal and interest rate to see predictions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="transactions-section" style="margin-top: 20px;">
+                <h2><i class="fas fa-list"></i> Savings Account Transactions</h2>
+                <div class="transaction-list" id="savings-transactions">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Transfers to savings will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <footer>
-            <p>&copy; 2023 Personal Finance Tracker | Made with <i class="fas fa-heart" style="color: #f72585;"></i></p>
+            <p>&copy; 2023 Advanced Personal Finance Tracker | Made with <i class="fas fa-heart" style="color: #f72585;"></i></p>
         </footer>
     </div>
 
     <script>
         // Initialize data
-        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-        let savingsGoal = 1000;
+        let accounts = {
+            checking: {
+                balance: 0,
+                transactions: []
+            },
+            savings: {
+                balance: 0,
+                transactions: [],
+                goal: 1000,
+                interestRate: 2.5
+            }
+        };
 
         // DOM Elements
-        const transactionForm = document.getElementById('transaction-form');
-        const transactionList = document.getElementById('transaction-list');
-        const totalIncomeEl = document.getElementById('total-income');
-        const totalExpensesEl = document.getElementById('total-expenses');
-        const totalSavingsEl = document.getElementById('total-savings');
-        const savingsCurrentEl = document.getElementById('savings-current');
-        const savingsGoalEl = document.getElementById('savings-goal');
-        const savingsProgressEl = document.getElementById('savings-progress');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const checkingForm = document.getElementById('checking-form');
+        const savingsGoalForm = document.getElementById('savings-goal-form');
+        const checkingDateInput = document.getElementById('checking-date');
 
         // Set today's date as default
-        document.getElementById('date').valueAsDate = new Date();
+        checkingDateInput.valueAsDate = new Date();
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('financeData');
+            if (savedData) {
+                accounts = JSON.parse(savedData);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('financeData', JSON.stringify(accounts));
+        }
+
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show active content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabName}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+                
+                // Update dashboard when switching to dashboard tab
+                if (tabName === 'dashboard') {
+                    updateDashboard();
+                    renderRecentTransactions();
+                } else if (tabName === 'checking') {
+                    renderCheckingTransactions();
+                } else if (tabName === 'savings') {
+                    updateSavingsDisplay();
+                    renderSavingsTransactions();
+                    renderPredictions();
+                }
+            });
+        });
 
         // Event Listeners
-        transactionForm.addEventListener('submit', addTransaction);
+        checkingForm.addEventListener('submit', addCheckingTransaction);
+        savingsGoalForm.addEventListener('submit', setSavingsGoal);
 
         // Initialize
+        loadData();
         updateDashboard();
-        renderTransactions();
+        renderRecentTransactions();
 
         // Functions
-        function addTransaction(e) {
+        function addCheckingTransaction(e) {
             e.preventDefault();
 
-            const description = document.getElementById('description').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const type = document.getElementById('type').value;
-            const category = document.getElementById('category').value;
-            const date = document.getElementById('date').value;
+            const description = document.getElementById('checking-description').value;
+            const amount = parseFloat(document.getElementById('checking-amount').value);
+            const type = document.getElementById('checking-type').value;
+            const category = document.getElementById('checking-category').value;
+            const date = document.getElementById('checking-date').value;
 
             if (!description || !amount || !type || !category || !date) {
                 alert('Please fill in all fields');
@@ -525,49 +751,76 @@
                 date
             };
 
-            transactions.push(transaction);
-            saveTransactions();
+            // Handle different transaction types
+            if (type === 'transfer-to-savings') {
+                if (amount > accounts.checking.balance) {
+                    alert('Insufficient funds in checking account');
+                    return;
+                }
+                accounts.checking.balance -= amount;
+                accounts.savings.balance += amount;
+                transaction.description = `Transfer to Savings: ${description}`;
+            } else if (type === 'income') {
+                accounts.checking.balance += amount;
+            } else if (type === 'expense') {
+                if (amount > accounts.checking.balance) {
+                    alert('Insufficient funds in checking account');
+                    return;
+                }
+                accounts.checking.balance -= amount;
+            }
+
+            accounts.checking.transactions.push(transaction);
+            saveData();
             updateDashboard();
-            renderTransactions();
+            renderCheckingTransactions();
+            renderRecentTransactions();
 
             // Reset form
-            transactionForm.reset();
-            document.getElementById('date').valueAsDate = new Date();
+            checkingForm.reset();
+            checkingDateInput.valueAsDate = new Date();
         }
 
-        function deleteTransaction(id) {
-            transactions = transactions.filter(transaction => transaction.id !== id);
-            saveTransactions();
-            updateDashboard();
-            renderTransactions();
-        }
+        function setSavingsGoal(e) {
+            e.preventDefault();
 
-        function saveTransactions() {
-            localStorage.setItem('transactions', JSON.stringify(transactions));
+            const goal = parseFloat(document.getElementById('savings-goal').value);
+            const interestRate = parseFloat(document.getElementById('interest-rate').value);
+
+            if (!goal || !interestRate) {
+                alert('Please enter both goal amount and interest rate');
+                return;
+            }
+
+            accounts.savings.goal = goal;
+            accounts.savings.interestRate = interestRate;
+            saveData();
+            updateSavingsDisplay();
+            renderPredictions();
         }
 
         function updateDashboard() {
-            const totalIncome = transactions
-                .filter(t => t.type === 'income')
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const totalExpenses = transactions
-                .filter(t => t.type === 'expense')
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const totalSavings = totalIncome - totalExpenses;
-            const savingsPercentage = Math.min((totalSavings / savingsGoal) * 100, 100);
-
-            totalIncomeEl.textContent = `$${totalIncome.toFixed(2)}`;
-            totalExpensesEl.textContent = `$${totalExpenses.toFixed(2)}`;
-            totalSavingsEl.textContent = `$${totalSavings.toFixed(2)}`;
-            savingsCurrentEl.textContent = `$${totalSavings.toFixed(2)}`;
-            savingsGoalEl.textContent = `Goal: $${savingsGoal.toFixed(2)}`;
-            savingsProgressEl.style.width = `${savingsPercentage}%`;
+            document.getElementById('checking-balance').textContent = `$${accounts.checking.balance.toFixed(2)}`;
+            document.getElementById('savings-balance').textContent = `$${accounts.savings.balance.toFixed(2)}`;
+            document.getElementById('total-net-worth').textContent = `$${(accounts.checking.balance + accounts.savings.balance).toFixed(2)}`;
         }
 
-        function renderTransactions() {
-            if (transactions.length === 0) {
+        function updateSavingsDisplay() {
+            const savingsPercentage = Math.min((accounts.savings.balance / accounts.savings.goal) * 100, 100);
+            
+            document.getElementById('savings-current').textContent = `$${accounts.savings.balance.toFixed(2)}`;
+            document.getElementById('savings-goal-display').textContent = `Goal: $${accounts.savings.goal.toFixed(2)}`;
+            document.getElementById('savings-progress').style.width = `${savingsPercentage}%`;
+            
+            // Pre-fill form with current values
+            document.getElementById('savings-goal').value = accounts.savings.goal;
+            document.getElementById('interest-rate').value = accounts.savings.interestRate;
+        }
+
+        function renderCheckingTransactions() {
+            const transactionList = document.getElementById('checking-transactions');
+            
+            if (accounts.checking.transactions.length === 0) {
                 transactionList.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-inbox"></i>
@@ -579,7 +832,7 @@
             }
 
             // Sort transactions by date (newest first)
-            const sortedTransactions = [...transactions].sort((a, b) => 
+            const sortedTransactions = [...accounts.checking.transactions].sort((a, b) => 
                 new Date(b.date) - new Date(a.date)
             );
 
@@ -589,17 +842,163 @@
                         <div class="transaction-title">${transaction.description}</div>
                         <div class="transaction-category">${getCategoryName(transaction.category)}</div>
                     </div>
-                    <div class="transaction-amount ${transaction.type === 'income' ? 'income-amount' : 'expense-amount'}">
-                        ${transaction.type === 'income' ? '+' : '-'}$${transaction.amount.toFixed(2)}
+                    <div class="transaction-amount ${getTransactionClass(transaction.type)}">
+                        ${getTransactionSign(transaction.type)}$${transaction.amount.toFixed(2)}
                     </div>
                     <div class="transaction-date">
                         ${formatDate(transaction.date)}
                     </div>
-                    <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
                 </div>
             `).join('');
+        }
+
+        function renderSavingsTransactions() {
+            const transactionList = document.getElementById('savings-transactions');
+            
+            // Get transfer transactions from checking account that go to savings
+            const savingsTransfers = accounts.checking.transactions
+                .filter(t => t.type === 'transfer-to-savings')
+                .map(t => ({
+                    ...t,
+                    type: 'transfer'
+                }));
+
+            if (savingsTransfers.length === 0) {
+                transactionList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Transfers to savings will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort transactions by date (newest first)
+            const sortedTransactions = [...savingsTransfers].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+
+            transactionList.innerHTML = sortedTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">${transaction.description.replace('Transfer to Savings: ', '')}</div>
+                        <div class="transaction-category">Transfer</div>
+                    </div>
+                    <div class="transaction-amount transfer-amount">
+                        +$${transaction.amount.toFixed(2)}
+                    </div>
+                    <div class="transaction-date">
+                        ${formatDate(transaction.date)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRecentTransactions() {
+            const transactionList = document.getElementById('recent-transactions');
+            
+            // Combine all transactions
+            const allTransactions = [
+                ...accounts.checking.transactions.map(t => ({...t, account: 'checking'})),
+                ...accounts.checking.transactions
+                    .filter(t => t.type === 'transfer-to-savings')
+                    .map(t => ({...t, account: 'savings', type: 'transfer'}))
+            ];
+
+            if (allTransactions.length === 0) {
+                transactionList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Add your first transaction to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort transactions by date (newest first) and take last 5
+            const recentTransactions = [...allTransactions]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5);
+
+            transactionList.innerHTML = recentTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-title">${transaction.description.replace('Transfer to Savings: ', '')}</div>
+                        <div class="transaction-category">${transaction.account === 'savings' ? 'Transfer to Savings' : getCategoryName(transaction.category)}</div>
+                    </div>
+                    <div class="transaction-amount ${getTransactionClass(transaction.type)}">
+                        ${getTransactionSign(transaction.type)}$${transaction.amount.toFixed(2)}
+                    </div>
+                    <div class="transaction-date">
+                        ${formatDate(transaction.date)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPredictions() {
+            const tableBody = document.getElementById('predictions-table-body');
+            
+            if (!accounts.savings.goal || !accounts.savings.interestRate) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #6c757d;">Set a savings goal and interest rate to see predictions</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let currentBalance = accounts.savings.balance;
+            let html = '';
+
+            for (let i = 1; i <= 12; i++) {
+                const predictedAmount = currentBalance * (1 + accounts.savings.interestRate / 100);
+                const difference = ((predictedAmount - currentBalance) / currentBalance) * 100;
+                
+                html += `
+                    <tr>
+                        <td>Month ${i}</td>
+                        <td class="prediction-amount">$${predictedAmount.toFixed(2)}</td>
+                        <td>
+                            <input type="number" class="actual-input" placeholder="Actual" data-month="${i}" step="0.01">
+                        </td>
+                        <td class="difference-positive">${difference.toFixed(2)}%</td>
+                    </tr>
+                `;
+                
+                currentBalance = predictedAmount;
+            }
+
+            tableBody.innerHTML = html;
+        }
+
+        function getTransactionClass(type) {
+            switch (type) {
+                case 'income':
+                case 'transfer':
+                    return 'income-amount';
+                case 'expense':
+                    return 'expense-amount';
+                case 'transfer-to-savings':
+                    return 'transfer-amount';
+                default:
+                    return '';
+            }
+        }
+
+        function getTransactionSign(type) {
+            switch (type) {
+                case 'income':
+                case 'transfer':
+                    return '+';
+                case 'expense':
+                case 'transfer-to-savings':
+                    return '-';
+                default:
+                    return '';
+            }
         }
 
         function getCategoryName(category) {
@@ -628,9 +1027,6 @@
                 year: 'numeric'
             });
         }
-
-        // Make deleteTransaction available globally for inline onclick
-        window.deleteTransaction = deleteTransaction;
     </script>
 </body>
 </html>
